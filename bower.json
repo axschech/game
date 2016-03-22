@@ -1,0 +1,21 @@
+{
+  "name": "game",
+  "homepage": "https://github.com/axschech/game",
+  "description": "",
+  "main": "index.html",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "phaser": "~2.4.6"
+  }
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="bower_components/phaser/build/phaser.min.js"></script>
+    <title></title>
+</head>
+<body>
+
+    <script type="text/javascript">
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update }),
+            player1, player2, platforms,
+            moving, prompt, happening = false, prompted = false;
+
+        function preload() {
+            game.load.image('sky', 'assets/sky.png');
+            game.load.image('ground', 'assets/platform.png');
+            game.load.image('star', 'assets/star.png');
+            game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+        }
+
+        function create() {
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+            game.add.sprite(0, 0, 'sky');
+
+            platforms = game.add.group();
+            platforms.enableBody = true;
+
+            var ground = platforms.create(0, game.world.height - 64, 'ground'),
+                height = game.cache.getImage('dude').height;
+            ground.scale.setTo(2, 2);
+            ground.body.immovable = true;
+
+            player1 = game.add.sprite(32, game.world.height - (height + ground.height), 'dude');
+            game.physics.arcade.enable(player1);
+
+            player1.body.bounce.y = 0.2;
+            player1.body.gravity.y = 300;
+            player1.body.collideWorldBounds = true;
+
+            player1.animations.add('left', [0, 1, 2, 3], 10, true);
+            player1.animations.add('right', [5, 6, 7, 8], 10, true);
+
+
+            player2 = game.add.sprite(game.world.width - 350, game.world.height - (height + ground.height), 'dude');
+            player2.frame = 4;
+            game.physics.arcade.enable(player2);
+
+            cursors = game.input.keyboard.createCursorKeys();
+            jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            jumpButton.onDown.add(function () {
+                game.physics.arcade.overlap(player1, player2, prompt, null);
+            }, this);
+            moving = function () {
+                if (prompted) {
+                    return false;
+                }
+                if (cursors.left.isDown || cursors.right.isDown) {
+                    return true;
+                }
+                return false;
+            };
+            prompt = function () {
+                prompted = !prompted;
+                if (prompted) {
+                    choice1 = game.add.text(200, 200, "Choice 1", {
+                        'font-size': '100px',
+                        fill: '#000'
+                    });
+                    choice2 = game.add.text(200, 250, "Choice 2", {
+                        'font-size': '100px',
+                        fill: '#000'
+                    });
+                } else {
+                    choice1.destroy();
+                    choice2.destroy();
+                }
+            };
+
+        }
+
+        function update() {
+            game.world.bringToTop(player1);
+            game.physics.arcade.collide(player1, platforms);
+            game.physics.arcade.collide(player2, platforms);
+
+            player1.body.velocity.x = 0;
+
+            if (!prompted) {
+
+                if (cursors.left.isDown)
+                {
+                    player1.body.velocity.x = -150;
+                    player1.animations.play('left');
+                    return;
+                }
+
+                if (cursors.right.isDown)
+                {
+                    player1.body.velocity.x = 150;
+                    player1.animations.play('right');
+                    return;
+                }
+            }
+            if(!moving())
+            {
+                player1.animations.stop();
+                player1.frame = 4;
+            }
+
+
+        }
+    </script>
+</body>
+</html>
