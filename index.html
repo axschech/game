@@ -36,8 +36,6 @@
             player1 = game.add.sprite(32, game.world.height - (height + ground.height), 'dude');
             game.physics.arcade.enable(player1);
 
-            player1.body.bounce.y = 0.2;
-            player1.body.gravity.y = 300;
             player1.body.collideWorldBounds = true;
 
             player1.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -52,6 +50,7 @@
             player2.body.immovable = true;
 
             cursors = game.input.keyboard.createCursorKeys();
+            console.log(cursors);
             jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             jumpButton.onDown.add(function () {
                 checkOverlap(player2, player1, prompt);
@@ -94,6 +93,7 @@
             game.physics.arcade.collide(player2, platforms);
 
             player1.body.velocity.x = 0;
+            player1.body.velocity.y = 0;
 
             if (!prompted) {
 
@@ -108,6 +108,19 @@
                 {
                     player1.body.velocity.x = 150;
                     player1.animations.play('right');
+                    return;
+                }
+
+                if (cursors.up.isDown) {
+                    console.log('going up');
+                    player1.body.velocity.y = -150;
+                    player1.frame = 4;
+                    return;
+                }
+
+                if (cursors.down.isDown) {
+                    player1.body.velocity.y = 150;
+                    player1.frame = 4;
                     return;
                 }
             }
