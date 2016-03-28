@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-
+    <h2>Move with arrow keys, open prompt with space bar</h2>
     <script type="text/javascript">
         var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
             preload: preload, create: create, update: update
@@ -81,6 +81,7 @@
                 } else {
                     choice1.destroy();
                     choice2.destroy();
+                    dialogBox.destroy();
                 }
             };
 
