@@ -7,11 +7,14 @@
 <body>
 
     <script type="text/javascript">
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update }),
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
+            preload: preload, create: create, update: update
+        }),
             player1, player2, platforms,
             moving, prompt, happening = false, prompted = false;
 
         function preload() {
+            game.load.image('dialog', 'assets/dialog.png');
             game.load.image('sky', 'assets/sky.png');
             game.load.image('ground', 'assets/platform.png');
             game.load.image('star', 'assets/star.png');
@@ -42,13 +45,16 @@
 
 
             player2 = game.add.sprite(game.world.width - 350, game.world.height - (height + ground.height), 'dude');
-            player2.frame = 4;
             game.physics.arcade.enable(player2);
+            // player2.scale.setTo(2, 2);
+            player2.frame = 4;
+            player1.body.collideWorldBounds = true;
+            player2.body.immovable = true;
 
             cursors = game.input.keyboard.createCursorKeys();
             jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             jumpButton.onDown.add(function () {
-                game.physics.arcade.overlap(player1, player2, prompt, null);
+                checkOverlap(player2, player1, prompt);
             }, this);
             moving = function () {
                 if (prompted) {
@@ -62,13 +68,15 @@
             prompt = function () {
                 prompted = !prompted;
                 if (prompted) {
-                    choice1 = game.add.text(200, 200, "Choice 1", {
+                    dialogBox = game.add.image(50, 175, "dialog");
+                    dialogBox.scale.setTo(0.75, 0.5);
+                    choice1 = game.add.text(100, 200, "Choice 1", {
                         'font-size': '100px',
-                        fill: '#000'
+                        fill: '#fff'
                     });
-                    choice2 = game.add.text(200, 250, "Choice 2", {
+                    choice2 = game.add.text(300, 200, "Choice 2", {
                         'font-size': '100px',
-                        fill: '#000'
+                        fill: '#fff'
                     });
                 } else {
                     choice1.destroy();
@@ -79,7 +87,8 @@
         }
 
         function update() {
-            game.world.bringToTop(player1);
+
+            game.physics.arcade.collide(player1, player2);
             game.physics.arcade.collide(player1, platforms);
             game.physics.arcade.collide(player2, platforms);
 
@@ -109,6 +118,17 @@
 
 
         }
+
+        function checkOverlap(spriteA, spriteB, callback) {
+
+            var boundsA = spriteA.getBounds(),
+                boundsB = spriteB.getBounds();
+            if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+                callback();
+            }
+
+        }
+
     </script>
 </body>
 </html>
