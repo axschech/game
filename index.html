@@ -11,7 +11,7 @@
             preload: preload, create: create, update: update
         }),
             player1, player2, platforms,
-            moving, prompt, happening = false, prompted = false;
+            moving, prompts, happening = false, prompted = false;
 
         function preload() {
             game.load.image('dialog', 'assets/dialog.png');
@@ -53,7 +53,11 @@
             console.log(cursors);
             jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             jumpButton.onDown.add(function () {
-                checkOverlap(player2, player1, prompt);
+                if (this.result && prompted) {
+                    this.result.close();
+                    return;
+                }
+                this.result = checkOverlap(player2, player1, prompts);
             }, this);
             moving = function () {
                 if (prompted) {
@@ -64,26 +68,44 @@
                 }
                 return false;
             };
-            prompt = function () {
-                prompted = !prompted;
-                if (prompted) {
-                    dialogBox = game.add.image(50, 175, "dialog");
-                    dialogBox.scale.setTo(0.75, 0.5);
-                    choice1 = game.add.text(100, 200, "Choice 1", {
+            prompts = function () {
+                console.log(prompted);
+                if (!prompted) {
+                    prompted = true;
+                    this.dialog1 = {};
+                    this.dialog1.dialogBox = game.add.image(50, 50, "dialog");
+                    this.dialog1.dialogBox.scale.setTo(0.75, 0.9);
+                    this.dialog1.choice1 = game.add.text(100, 75, "Choice 1", {
                         'font-size': '100px',
+                        'font-family': 'Helvetica',
                         fill: '#fff'
                     });
-                    choice2 = game.add.text(300, 200, "Choice 2", {
+                    this.dialog1.choice1.inputEnabled = true;
+                    this.dialog1.choice1.events.onInputOver.add(function (item) {
+                        console.log('am happening');
+                        item.fill = "#ff0044";
+                    }, this.dialog1.choice1);
+                    this.dialog1.choice1.events.onInputOut.add(function (item) {
+                        item.fill = "#fff";
+                    });
+                    this.dialog1.choice2 = game.add.text(250, 75, "Choice 2", {
                         'font-size': '100px',
+                        'font-family': 'Helvetica',
                         fill: '#fff'
                     });
-                } else {
-                    choice1.destroy();
-                    choice2.destroy();
-                    dialogBox.destroy();
-                }
-            };
 
+                } else {
+                    this.dialog1.close();
+                }
+                this.dialog1.close = function () {
+                    console.log(this);
+                    this.choice1.destroy();
+                    this.choice2.destroy();
+                    this.dialogBox.destroy();
+                    prompted = false;
+                };
+                return this.dialog1;
+            };
         }
 
         function update() {
@@ -138,7 +160,7 @@
             var boundsA = spriteA.getBounds(),
                 boundsB = spriteB.getBounds();
             if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
-                callback();
+                return callback();
             }
 
         }
