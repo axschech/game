@@ -19,6 +19,8 @@
             game.load.image('ground', 'assets/platform.png');
             game.load.image('star', 'assets/star.png');
             game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+
+            game.load.audio('intro', 'assets/intro.mp3');
         }
 
         function create() {
@@ -50,7 +52,6 @@
             player2.body.immovable = true;
 
             cursors = game.input.keyboard.createCursorKeys();
-            console.log(cursors);
             jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             jumpButton.onDown.add(function () {
                 if (this.result && prompted) {
@@ -106,6 +107,8 @@
                 };
                 return this.dialog1;
             };
+            music = game.add.audio('intro');
+            music.play();
         }
 
         function update() {
